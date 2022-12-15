@@ -1,0 +1,15 @@
+C:\Users\Gabriel\source\repos\PointsDetection\bin\Debug\net6.0\PointsDetection.exe
+C:\Users\Gabriel\source\repos\PointsDetection\bin\Debug\net6.0\PointsDetection.deps.json
+C:\Users\Gabriel\source\repos\PointsDetection\bin\Debug\net6.0\PointsDetection.runtimeconfig.json
+C:\Users\Gabriel\source\repos\PointsDetection\bin\Debug\net6.0\PointsDetection.dll
+C:\Users\Gabriel\source\repos\PointsDetection\bin\Debug\net6.0\PointsDetection.pdb
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.csproj.AssemblyReference.cache
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.AssemblyInfoInputs.cache
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.AssemblyInfo.cs
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.csproj.CoreCompileInputs.cache
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.dll
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\refint\PointsDetection.dll
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.pdb
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\PointsDetection.genruntimeconfig.cache
+C:\Users\Gabriel\source\repos\PointsDetection\obj\Debug\net6.0\ref\PointsDetection.dll

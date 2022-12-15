@@ -1,0 +1,6 @@
+﻿  CppVsPointDetection.cpp
+C:\Users\Gabriel\source\repos\CppVsPointDetection\CppVsPointDetection\CppVsPointDetection.cpp(10,23): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Gabriel\source\repos\CppVsPointDetection\CppVsPointDetection\CppVsPointDetection.cpp(16,23): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Gabriel\source\repos\CppVsPointDetection\CppVsPointDetection\CppVsPointDetection.cpp(23,27): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Gabriel\source\repos\CppVsPointDetection\CppVsPointDetection\CppVsPointDetection.cpp(34,27): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  CppVsPointDetection.vcxproj -> C:\Users\Gabriel\source\repos\CppVsPointDetection\Debug\CppVsPointDetection.exe
