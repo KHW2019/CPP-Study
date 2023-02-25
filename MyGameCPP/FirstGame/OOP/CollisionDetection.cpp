@@ -1,7 +1,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "CollisionDetection.h"
-#include "Ball.h"
 
 // void CollisionDetection::CollideWithPaddle(Contact const& contact, Ball ball)
 // {
@@ -20,9 +19,9 @@
 Ball::Contact CollisionDetection::checkPaddleCollision(Ball const& ball, Paddle const& paddle)
 {
     float ballLeft = ball.position.x;
-    float ballRight = ball.position.x + BALL_WIDTH;
+    float ballRight = ball.position.x + ball.BALL_WIDTH;
     float ballTop = ball.position.y;
-    float ballBottom = ball.position.y + BALL_HEIGHT;
+    float ballBottom = ball.position.y + ball.BALL_HEIGHT;
 
     float paddleLeft = paddle.position.x;
     float paddleRight = paddle.position.x + PADDLE_WIDTH;
@@ -82,9 +81,9 @@ Ball::Contact CollisionDetection::checkPaddleCollision(Ball const& ball, Paddle 
 Ball::Contact CollisionDetection::CheckWallCollision(Ball const& ball)
 {
     float ballLeft = ball.position.x;
-    float ballRight = ball.position.x + BALL_WIDTH;
+    float ballRight = ball.position.x + ball.BALL_WIDTH;
     float ballTop = ball.position.y;
-    float ballBottom = ball.position.y + BALL_HEIGHT;
+    float ballBottom = ball.position.y + ball.BALL_HEIGHT;
 
     Ball::Contact contact{};
 
@@ -92,7 +91,7 @@ Ball::Contact CollisionDetection::CheckWallCollision(Ball const& ball)
     {
         contact.type = Ball::CollisionType::left;
     }
-    else if(ballRight > WINDOW_WIDTH)
+    else if(ballRight > GM.WINDOW_WIDTH)
     {
         contact.type = Ball::CollisionType::right;
     }
@@ -100,7 +99,7 @@ Ball::Contact CollisionDetection::CheckWallCollision(Ball const& ball)
     {
         contact.type = Ball::CollisionType::Top;
     }
-    else if(ballBottom > WINDOW_HEIGHT)
+    else if(ballBottom > GM.WINDOW_HEIGHT)
     {
         contact.type = Ball::CollisionType::Bottom;
     }

@@ -1,16 +1,18 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Vec2.h"
+#include "GameManager.h"
 
 #ifndef Ball_H
 #define Ball_H
 
-const int BALL_WIDTH = 15, BALL_HEIGHT = 15;
-
-const float BALL_SPEED = 1.0f;
-
 class Ball{
+private:
+    
+    GameManager GM;
+
 public:
+    const int BALL_WIDTH = 15, BALL_HEIGHT = 15;
     Vec2 position;
     Vec2 velocity;
     SDL_Rect BallRect{};

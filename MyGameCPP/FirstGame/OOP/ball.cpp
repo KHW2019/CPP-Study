@@ -1,7 +1,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Ball.h"
-#include "CollisionDetection.h"
 
 using namespace std;
 
@@ -21,10 +20,10 @@ void Ball::CollideWithPaddle(Contact const& contact)
 
     if(contact.type == CollisionType::Top)
     {
-        velocity.y = -0.75f * BALL_SPEED;
+        velocity.y = -0.75f * GM.BALL_SPEED;
     }else if(contact.type == CollisionType::Bottom)
     {
-        velocity.y = 0.75f * BALL_SPEED;
+        velocity.y = 0.75f * GM.BALL_SPEED;
     }
 } 
 
@@ -38,17 +37,17 @@ void Ball::CollideWithWall(Contact const& contact)
     }
     else if(contact.type == CollisionType::left)
     {
-        position.x = WINDOW_WIDTH / 2.0f;
-        position.y = WINDOW_HEIGHT / 2.0f;
-        velocity.x = BALL_SPEED;
-        velocity.y = 0.75f * BALL_SPEED;
+        position.x = GM.WINDOW_WIDTH / 2.0f;
+        position.y = GM.WINDOW_HEIGHT / 2.0f;
+        velocity.x = GM.BALL_SPEED;
+        velocity.y = 0.75f * GM.BALL_SPEED;
     }
     else if(contact.type == CollisionType::right)
     {
-        position.x = WINDOW_WIDTH / 2.0f;
-        position.y = WINDOW_HEIGHT / 2.0f;
-        velocity.x = -BALL_SPEED;
-        velocity.y = 0.75f* BALL_SPEED;
+        position.x = GM.WINDOW_WIDTH / 2.0f;
+        position.y = GM.WINDOW_HEIGHT / 2.0f;
+        velocity.x = -GM.BALL_SPEED;
+        velocity.y = 0.75f* GM.BALL_SPEED;
     }
 }
 

@@ -1,8 +1,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include "Vec2.h"
 #include "Paddle.h"
-
 
 using namespace std;
 
@@ -22,9 +20,9 @@ void Paddle::PaddleUpdate(float dt)
 	if(position.y < 0){
 		position.y = 0;
 	}
-	else if(position.y > (WINDOW_HEIGHT - PADDLE_HEIGHT))
+	else if(position.y > (GM.WINDOW_HEIGHT - PADDLE_HEIGHT))
 	{
-		position.y = WINDOW_HEIGHT - PADDLE_HEIGHT;
+		position.y = GM.WINDOW_HEIGHT - PADDLE_HEIGHT;
 	}
 }
 

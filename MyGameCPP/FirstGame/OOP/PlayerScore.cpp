@@ -8,11 +8,12 @@
 
 using namespace std;
 
-PlayerScore::PlayerScore(Vec2 position, SDL_Renderer *renderer, TTF_Font *font)
-	: renderer(renderer), font(font)
+PlayerScore::PlayerScore(Vec2 position,string PlayerScoreText, SDL_Renderer *renderer, TTF_Font* Font)
+	: renderer(renderer), Font(Font)
 {
-	SDL_Color Color = {255, 255, 255};
-	surface = TTF_RenderText_Solid(font, "0", Color);
+	SDL_Color Color = {255, 255, 255, 255};
+
+	surface = TTF_RenderText_Solid(Font, PlayerScoreText.c_str(), Color);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 
 	int width, height;
@@ -39,7 +40,7 @@ void PlayerScore::SetScore(int Score)
 {
 	PlayerScore::~PlayerScore();
 
-	surface = TTF_RenderText_Solid(font, to_string(Score).c_str(),{0xFF,0xFF,0xFF,0xFF});
+	surface = TTF_RenderText_Solid(Font, to_string(Score).c_str(),{0xFF,0xFF,0xFF,0xFF});
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 
 	int width, height;
@@ -47,9 +48,3 @@ void PlayerScore::SetScore(int Score)
 	PlayerScoreRect.w = width;
 	PlayerScoreRect.h = height;
 }
-
-SDL_Renderer *renderer;
-TTF_Font *font;
-SDL_Surface *surface{};
-SDL_Texture *texture{};
-SDL_Rect PlayerScoreRect{};

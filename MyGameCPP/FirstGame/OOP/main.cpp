@@ -9,25 +9,30 @@
 #include "Paddle.h"
 #include "PlayerScore.h"
 #include "CollisionDetection.h"
+#include "MainMenu.h"
+#include "GameManager.h"
+#include "inGame.h"
 
 using namespace std;
+using namespace std::chrono;
 
-enum Buttons
-{
-    PaddleOneUp = 0,
-    PaddleOneDown,
-    PaddleTwoUp,
-    PaddleTwoDown,
-};
+// enum Buttons
+// {
+//     PaddleOneUp = 0,
+//     PaddleOneDown,
+//     PaddleTwoUp,
+//     PaddleTwoDown,
+// };
 
-const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
+// const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
 
-int CenterLocation = SDL_WINDOWPOS_CENTERED;
-
-const float PADDLE_SPEED = 1.0f;
+// int CenterLocation = SDL_WINDOWPOS_CENTERED;
+const float BALL_SPEED = 1.0f;
 
 CollisionDetection cd;
 Ball::Contact contact;
+GameManager GM;
+inGame GameSection;
 
 int main(int argc, char *argv[])
 {
@@ -35,211 +40,263 @@ int main(int argc, char *argv[])
     TTF_Init();
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
-    if(TTF_Init() == -1){
-        cout<< "TTF INIT Error : " << TTF_GetError() << endl; 
-        return 1;
-    }
+    GM.CreateWindow();
+   
+    GM.CreateRenderer();
+
+    GM.CreateFont();
+
+    GM.CreateSound();
+
+    // GameSection.CreateTopBar();
     
-    SDL_Window* window = SDL_CreateWindow("Pong", CenterLocation, CenterLocation, WINDOW_WIDTH, WINDOW_HEIGHT,SDL_WINDOW_SHOWN);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    // MainMenu startMenu(renderer);
+    
+    // Mouse mouse(renderer);
 
-    TTF_Font* scoreFont = TTF_OpenFont("src/include/dejavu-fonts-ttf/ttf/DejaVuSansMono.ttf", 40);
+    //TopBar
+    PlayerScore playerOneNameTag(Vec2(0, 20),"PlayerOne : ", GM.renderer,GM.scoreFont);
+    PlayerScore playerOneScore(Vec2(GM.WINDOW_WIDTH / 4.5 , 20),"0", GM.renderer,GM.scoreFont);
+    PlayerScore playerTwoNameTag(Vec2(3 * GM.WINDOW_WIDTH / 4.5 , 20),"PlayerTwo :", GM.renderer,GM.scoreFont);
+    PlayerScore playerTwoScore(Vec2(3 * GM.WINDOW_WIDTH / 3.4 , 20),"0", GM.renderer,GM.scoreFont);
 
-    Mix_Chunk* wallHitSound = Mix_LoadWAV("src/include/Sound/WallHit.wav");
-    Mix_Chunk* paddleHitSound = Mix_LoadWAV("src/include/Sound/PaddleHit.wav");
-
-    PlayerScore playerOneScoreText(Vec2(WINDOW_WIDTH / 4, 20), renderer,scoreFont);
-    PlayerScore playerTwoScoreText(Vec2(3 * WINDOW_WIDTH / 4 , 20), renderer,scoreFont);
-
-    Ball ball(
-        Vec2(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT/ 2.0f), 
-        Vec2(BALL_SPEED, 0.0f));
+    // Ball ball(
+    //     Vec2(GM.WINDOW_WIDTH / 2.0f, GM.WINDOW_HEIGHT/ 2.0f), 
+    //     Vec2(Ball::BALL_SPEED, 0.0f));
         
-    Paddle paddleOne(Vec2(50.0f, WINDOW_HEIGHT / 2.0f), Vec2(0.0f, 0.0f));
+    // Paddle paddleOne(Vec2(50.0f, GM.WINDOW_HEIGHT / 2.0f), Vec2(0.0f, 0.0f));
 
-    Paddle paddleTwo(Vec2(WINDOW_WIDTH - 50.0f, WINDOW_HEIGHT /2.0f), Vec2(0.0f, 0.0f));
+    // Paddle paddleTwo(Vec2(GM.WINDOW_WIDTH - 50.0f, GM.WINDOW_HEIGHT /2.0f), Vec2(0.0f, 0.0f));
 
     {
         int PlayerOneScore = 0;
         int PlayerTwoScore = 0;
 
         bool running = true;
-        bool buttons[4] = {};
+        bool paused = false;
+        // bool buttons[4] = {};
 
-        float dt = 0.0f;        
+        float dt = 0.0f;
 
         // error massage
-        if (NULL == window)
-        {
-            cout << "could not create window : " << SDL_GetError() << endl;
-            exit (1);
-        }
-        
-        if(scoreFont == nullptr){
-            cout << "could not load font : " << SDL_GetError() << endl;
-            exit (1);
-        }
+       
+        GameManager::ErrorCheck();
+
+        // if(GM.scoreFont == nullptr){
+        //     cout << "could not load score font : " << SDL_GetError() << endl;
+        //     exit (1);
+        // }
 
         // looping until the window is close
         while (running)
         {
-            auto startTime = chrono::high_resolution_clock::now();
-
+            // GM.startTimer();
+            auto startTime = high_resolution_clock::now();
+            
             SDL_Event windowEvent;
             while (SDL_PollEvent(&windowEvent))
             {
-                if (SDL_QUIT == windowEvent.type)
+                switch (windowEvent.type)
                 {
+                default:
+                    break;
+
+                case SDL_QUIT:
                     running = false;
                     break;
-                }
-                else if (SDL_KEYDOWN == windowEvent.type)
-                {
+                    
+                case SDL_KEYDOWN:
                     if (SDLK_ESCAPE == windowEvent.key.keysym.sym)
                     {
                         running = false;
                     }
-                    else if(SDLK_w == windowEvent.key.keysym.sym)
+                    else if (SDLK_w == windowEvent.key.keysym.sym)
                     {
-                        buttons[Buttons::PaddleOneUp] = true;
+                        GameSection.buttons[GameSection.Buttons::PaddleOneUp] = true;
+                        break;
                     }
-                    else if(SDLK_s == windowEvent.key.keysym.sym)
+                    else if (SDLK_s == windowEvent.key.keysym.sym)
                     {
-                        buttons[Buttons::PaddleOneDown] = true;
+                        GameSection.buttons[GameSection.Buttons::PaddleOneDown] = true;
+                        break;
                     }
-                    else if(SDLK_UP == windowEvent.key.keysym.sym)
+                    else if (SDLK_UP == windowEvent.key.keysym.sym)
                     {
-                        buttons[Buttons::PaddleTwoUp] = true;
+                        GameSection.buttons[GameSection.Buttons::PaddleTwoUp] = true;
+                        break;
                     }
-                    else if(SDLK_DOWN == windowEvent.key.keysym.sym)
+                    else if (SDLK_DOWN == windowEvent.key.keysym.sym)
                     {
-                        buttons[Buttons::PaddleTwoDown] = true;
+                        GameSection.buttons[GameSection.Buttons::PaddleTwoDown] = true;
+                        break;
+                    }
+                case SDL_KEYUP:
+                    if (SDLK_w == windowEvent.key.keysym.sym)
+                    {
+                        GameSection.buttons[GameSection.Buttons::PaddleOneUp] = false;
+                        break;
+                    }
+                    else if (SDLK_s == windowEvent.key.keysym.sym)
+                    {
+                        GameSection.buttons[GameSection.Buttons::PaddleOneDown] = false;
+                        break;
+                    }
+                    else if (SDLK_UP == windowEvent.key.keysym.sym)
+                    {
+                        GameSection.buttons[GameSection.Buttons::PaddleTwoUp] = false;
+                        break;
+                    }
+                    else if (SDLK_DOWN == windowEvent.key.keysym.sym)
+                    {
+                        GameSection.buttons[GameSection.Buttons::PaddleTwoDown] = false;
+                        break;
+                    }
+                case SDL_MOUSEBUTTONUP:
+                    if (windowEvent.button.button == SDL_BUTTON_LEFT)
+                    {
+                        // if (startButton.isSelected)
+                        // {
+                        //     cout << "StartButton has been Clicked" << endl;
+                        // }
+                        // else if (settingsButton.isSelected)
+                        // {
+                        //     cout << "OptionButton has been Clicked" << endl;
+                        // }
+                        // else if (quitButton.isSelected)
+                        // {
+                        //     running = false;
+                        //     return 0;
+                        // }
                     }
                 }
-                else if(SDL_KEYUP == windowEvent.type)
-                {
-                    if(SDLK_w == windowEvent.key.keysym.sym)
-                    {
-                        buttons[Buttons::PaddleOneUp] = false;
-                    }
-                    else if(SDLK_s == windowEvent.key.keysym.sym)
-                    {
-                        buttons[Buttons::PaddleOneDown] = false;
-                    }
-                    else if(SDLK_UP == windowEvent.key.keysym.sym)
-                    {
-                        buttons[Buttons::PaddleTwoUp] = false;
-                    }
-                    else if(SDLK_DOWN == windowEvent.key.keysym.sym)
-                    {
-                        buttons[Buttons::PaddleTwoDown] = false;
-                    }
-                }
-            }
 
-            if(buttons[Buttons::PaddleOneUp])
-            {
-                paddleOne.velocity.y = -PADDLE_SPEED;
-            }
-            else if(buttons[Buttons::PaddleOneDown])
-            {
-                paddleOne.velocity.y = PADDLE_SPEED;
-            }
-            else
-            {
-                paddleOne.velocity.y = 0.0f;
-            }
+                GameSection.PlayerController();
 
-            if(buttons[Buttons::PaddleTwoUp])
-            {
-                paddleTwo.velocity.y = -PADDLE_SPEED;
-            }
-            else if(buttons[Buttons::PaddleTwoDown])
-            {
-                paddleTwo.velocity.y = PADDLE_SPEED;
-            }
-            else
-            {
-                paddleTwo.velocity.y = 0.0f;
+                // if (buttons[Buttons::PaddleOneUp])
+                // {
+                //        paddleOne.velocity.y = -paddleOne.PADDLE_SPEED;
+                // }
+                // else if (buttons[Buttons::PaddleOneDown])
+                // {
+                //        paddleOne.velocity.y = paddleOne.PADDLE_SPEED;
+                // }
+                // else
+                // {
+                //        paddleOne.velocity.y = 0.0f;
+                // }
+
+                // if (buttons[Buttons::PaddleTwoUp])
+                // {
+                //        paddleTwo.velocity.y = -paddleTwo.PADDLE_SPEED;
+                // }
+                // else if (buttons[Buttons::PaddleTwoDown])
+                // {
+                //        paddleTwo.velocity.y = paddleTwo.PADDLE_SPEED;
+                // }
+                // else
+                // {
+                //        paddleTwo.velocity.y = 0.0f;
+                // }
             }
 
             // The color of the Background
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-            SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColor(GM.renderer, 160, 160, 0, 160);
+            SDL_RenderClear(GM.renderer);
 
-            // The Drawing Color of the line
-            SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+             // The Drawing Color of the line
+            // SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-            for (int y = 0; y < WINDOW_HEIGHT; y++)
-            {
-                if (y % 5)
-                {
-                    SDL_RenderDrawPoint(renderer, WINDOW_WIDTH / 2, y);
-                }
-            }
+            // for (int y = 0; y < GM.WINDOW_HEIGHT; y++)
+            // {
+            //     if (y % 5)
+            //     {
+            //         SDL_RenderDrawPoint(renderer, GM.WINDOW_WIDTH / 2, y);
+            //     }
+            // }
 
-            ball.Draw(renderer);
-            ball.BallUpdate(dt);
+            // startButton.Draw();
+            // startButton.Update(mouseT, "src/include/img/Start_Button_onTrigger.png");
+            // settingsButton.Draw();
+            // settingsButton.Update(mouseT, "src/include/img/Settings_Button_onTrigger.png");
+            // quitButton.Draw();
+            // quitButton.Update(mouseT, "src/include/img/Quit_Button_onTrigger.png");
 
-            paddleOne.Draw(renderer);
-            paddleTwo.Draw(renderer);
-            paddleOne.PaddleUpdate(dt);
-            paddleTwo.PaddleUpdate(dt);
+            // mouse.Draw();
+            // mouse.Update();
 
-            playerOneScoreText.Draw();
-            playerTwoScoreText.Draw();
+            // ball.Draw(renderer);
+            // ball.BallUpdate(dt);
+
+            // paddleOne.Draw(renderer);
+            // paddleOne.PaddleUpdate(dt);
+            // paddleTwo.Draw(renderer);
+            // paddleTwo.PaddleUpdate(dt);
+
+            // GameSection.DrawTopBar(GM.renderer);
+            GameSection.Draw(GM.renderer);
+            GameSection.Update(dt);
+
+            playerOneNameTag.Draw();
+            playerOneScore.Draw();
+            playerTwoNameTag.Draw();
+            playerTwoScore.Draw();
+
+            // startMenu.Draw();
+            // startMenu.Update();
 
             // Persent the backbuffer
-            SDL_RenderPresent(renderer);
+            SDL_RenderPresent(GM.renderer);
 
-            //Check Collision
-            if(contact = cd.checkPaddleCollision(ball, paddleOne);
-                contact.type != Ball::CollisionType::None)
-                {
-                    ball.CollideWithPaddle(contact);
+            GameSection.CheckCollision();
 
-                    Mix_PlayChannel(-1, paddleHitSound, 0);
-                }
-                else if(contact = cd.checkPaddleCollision(ball, paddleTwo);
-                contact.type != Ball::CollisionType::None)
-                {
-                    ball.CollideWithPaddle(contact);
+            // if (contact = cd.checkPaddleCollision(GameSection.ball, GameSection.paddleOne);
+            //     contact.type != Ball::CollisionType::None)
+            // {
+            //     GameSection.ball.CollideWithPaddle(contact);
 
-                    Mix_PlayChannel(-1, paddleHitSound, 0);
-                }
-                else if(contact = cd.CheckWallCollision(ball);
-                    contact.type != Ball::CollisionType::None)
-                    {
-                        ball.CollideWithWall(contact);
-                        if(contact.type == Ball::CollisionType::left)
-                        {
-                            ++PlayerTwoScore;
+            //     Mix_PlayChannel(-1, paddleHitSound, 0);
+            // }
+            // else if (contact = cd.checkPaddleCollision(GameSection.ball, GameSection.paddleTwo);
+            //          contact.type != Ball::CollisionType::None)
+            // {
+            //     GameSection.ball.CollideWithPaddle(contact);
 
-                            playerTwoScoreText.SetScore(PlayerTwoScore);
-                        }
-                        else if(contact.type == Ball::CollisionType::right)
-                        {
-                            ++PlayerOneScore;
+            //     Mix_PlayChannel(-1, paddleHitSound, 0);
+            // }
+            // else if (contact = cd.CheckWallCollision(GameSection.ball);
+            //          contact.type != Ball::CollisionType::None)
+            // {
+            //     GameSection.ball.CollideWithWall(contact);
+            //     if (contact.type == Ball::CollisionType::left)
+            //     {
+            //            ++GameSection.PlayerTwoScore;
 
-                            playerOneScoreText.SetScore(PlayerOneScore);
-                        }
-                        else
-                        {
-                            Mix_PlayChannel(-1, wallHitSound, 0);
-                        }
-                    }
+            //            playerTwoScore.SetScore(GameSection.PlayerTwoScore);
+            //     }
+            //     else if (contact.type == Ball::CollisionType::right)
+            //     {
+            //            ++GameSection.PlayerOneScore;
+
+            //            playerOneScore.SetScore(GameSection.PlayerOneScore);
+            //     }
+            //     else
+            //     {
+            //            Mix_PlayChannel(-1, wallHitSound, 0);
+            //     }
+            // }
 
             //Calculate frame time
-            auto stopTime = chrono::high_resolution_clock::now();
-            dt = chrono::duration<float , chrono::milliseconds::period>(stopTime - startTime).count();
+            // GM.stopTimer();
+            auto stopTime = high_resolution_clock::now();
+            dt = duration<float , milliseconds::period>(stopTime - startTime).count();
         }
     }
 
-    Mix_FreeChunk(wallHitSound);
-    Mix_FreeChunk(paddleHitSound);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    TTF_CloseFont(scoreFont);
+    Mix_FreeChunk(GM.wallHitSound);
+    Mix_FreeChunk(GM.paddleHitSound);
+    SDL_DestroyRenderer(GM.renderer);
+    SDL_DestroyWindow(GM.window);
+    TTF_CloseFont(GM.scoreFont);
     Mix_Quit();
     TTF_Quit();
     SDL_Quit();
